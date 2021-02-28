@@ -101,6 +101,27 @@ ring_buffer_size_t ring_buffer_dequeue_arr(ring_buffer_t *buffer, char *data, ri
  */
 uint8_t ring_buffer_peek(ring_buffer_t *buffer, char *data, ring_buffer_size_t index);
 
+/**
+ * Searches for provided byte in a ring buffer, returns index if found.
+ * @param buffer The buffer which should be searched in.
+ * @param search_data The byte to be searched for.
+ * @param search_idx Index of byte if found.
+ * @return 1 if data is found; 0 otherwise.
+ */
+uint8_t ring_buffer_search(ring_buffer_t *buffer, char search_data, ring_buffer_size_t* search_idx);
+
+/**
+ * Searches for the longest match of match buffer in search buffer.
+ *
+ * Search direction from tail to head. Only matches first occurrence.
+ *
+ * @param search_buffer The buffer to be searched.
+ * @param match_buffer The buffer to be matched.
+ * @param match_idx The index at which the match was found.
+ * @param match_len The length of the match.
+ * @return 1 if match was found; 0 otherwise.
+ */
+uint8_t ring_buffer_match(ring_buffer_t* search_buffer, ring_buffer_t* match_buffer, ring_buffer_size_t* match_idx, ring_buffer_size_t* match_len);
 
 /**
  * Returns whether a ring buffer is empty.

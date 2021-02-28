@@ -69,6 +69,61 @@ uint8_t ring_buffer_peek(ring_buffer_t *buffer, char *data, ring_buffer_size_t i
   return 1;
 }
 
+uint8_t ring_buffer_search(ring_buffer_t *buffer, char search_data, ring_buffer_size_t* search_idx)
+{
+    char data;
+
+    if(ring_buffer_is_empty(buffer))
+    {
+        return 0;
+    }
+
+    for (int idx = (ring_buffer_num_items(buffer) - 1); idx >= 0; --idx)
+    {
+        ring_buffer_peek(buffer, &data, idx);
+        if(data == search_data)
+        {
+            *search_idx = idx;
+            return 1;
+        }
+    }
+    return 0;
+}
+
+uint8_t ring_buffer_match(ring_buffer_t* search_buffer, ring_buffer_t* match_buffer, ring_buffer_size_t* match_idx, ring_buffer_size_t* match_len)
+{
+    ring_buffer_size_t search_buffer_len = ring_buffer_num_items(search_buffer);
+    ring_buffer_size_t match_buffer_len = ring_buffer_num_items(match_buffer);
+
+    ring_buffer_size_t len = search_buffer_len <= match_buffer_len ? search_buffer_len : match_buffer_len;
+
+    char search_data;
+    char match_data;
+    ring_buffer_size_t search_idx = 0;
+    ring_buffer_size_t _match_len = 0;
+
+    ring_buffer_peek(match_buffer, &match_data, 0);
+    if(ring_buffer_search(search_buffer, match_data, &search_idx))
+    {
+        *match_idx = search_idx;
+        _match_len++;
+        for (int i = 1; i < len; ++i) {
+            ring_buffer_peek(match_buffer, &match_data, i);
+            ring_buffer_peek(search_buffer, &search_data, (search_idx + i));
+            if(match_data != search_data)
+            {
+                *match_len = _match_len;
+                return 1;
+            }
+            _match_len++;
+        }
+    }
+
+    *match_idx = search_idx;
+    *match_len = _match_len;
+    return 0;
+}
+
 extern inline uint8_t ring_buffer_is_empty(ring_buffer_t *buffer);
 extern inline uint8_t ring_buffer_is_full(ring_buffer_t *buffer);
 extern inline ring_buffer_size_t ring_buffer_num_items(ring_buffer_t *buffer);
