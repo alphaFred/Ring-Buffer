@@ -92,34 +92,40 @@ uint8_t ring_buffer_search(ring_buffer_t *buffer, char search_data, ring_buffer_
 
 uint8_t ring_buffer_match(ring_buffer_t* search_buffer, ring_buffer_t* match_buffer, ring_buffer_size_t* match_idx, ring_buffer_size_t* match_len)
 {
+    char search_data = ' ';
+    char match_data = ' ';
+    char start_match_data = ' ';
+    ring_buffer_size_t i = 0U;
+    ring_buffer_size_t j = 0U;
+    ring_buffer_size_t _match_idx = 0U;
+    ring_buffer_size_t _match_len = 0U;
     ring_buffer_size_t search_buffer_len = ring_buffer_num_items(search_buffer);
     ring_buffer_size_t match_buffer_len = ring_buffer_num_items(match_buffer);
 
-    ring_buffer_size_t len = search_buffer_len <= match_buffer_len ? search_buffer_len : match_buffer_len;
+    ring_buffer_peek(match_buffer, &start_match_data, 0);
 
-    char search_data;
-    char match_data;
-    ring_buffer_size_t search_idx = 0;
-    ring_buffer_size_t _match_len = 0;
-
-    ring_buffer_peek(match_buffer, &match_data, 0);
-    if(ring_buffer_search(search_buffer, match_data, &search_idx))
-    {
-        *match_idx = search_idx;
-        _match_len++;
-        for (int i = 1; i < len; ++i) {
-            ring_buffer_peek(match_buffer, &match_data, i);
-            ring_buffer_peek(search_buffer, &search_data, (search_idx + i));
-            if(match_data != search_data)
-            {
-                *match_len = _match_len;
-                return 1;
+    for (i = 0; i < search_buffer_len; ++i) {
+        ring_buffer_peek(search_buffer, &search_data, i);
+        if(start_match_data == search_data)
+        {
+            ring_buffer_size_t max_j = (((search_buffer_len - i) < match_buffer_len) ? (search_buffer_len - i) : match_buffer_len);
+            for (j = 1; j <= max_j; ++j) {
+                ring_buffer_peek(match_buffer, &match_data, j);
+                ring_buffer_peek(search_buffer, &search_data, (i + j));
+                if(match_data != search_data)
+                {
+                    break;
+                }
             }
-            _match_len++;
+            if(j > _match_len)
+            {
+                _match_len = j;
+                _match_idx = i;
+            }
         }
     }
 
-    *match_idx = search_idx;
+    *match_idx = _match_idx;
     *match_len = _match_len;
     return 0;
 }
