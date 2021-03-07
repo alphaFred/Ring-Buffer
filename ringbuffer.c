@@ -40,6 +40,24 @@ void ring_buffer_queue_arr(ring_buffer_t *buffer, const char *data, ring_buffer_
     }
 }
 
+void ring_buffer_queue_rb(ring_buffer_t *buffer, ring_buffer_t *src_buffer, ring_buffer_size_t size)
+{
+    if (ring_buffer_is_empty(src_buffer))
+    {
+        /* No items */
+        return;
+    }
+
+    char copy_data;
+    ring_buffer_size_t cnt = 0;
+    while ((cnt < size) && ring_buffer_dequeue(src_buffer, &copy_data))
+    {
+        cnt++;
+        ring_buffer_queue(buffer, copy_data);
+    }
+    return;
+}
+
 uint8_t ring_buffer_dequeue(ring_buffer_t *buffer, char *data)
 {
     if (ring_buffer_is_empty(buffer))

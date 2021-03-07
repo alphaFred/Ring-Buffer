@@ -77,6 +77,14 @@ void ring_buffer_queue(ring_buffer_t *buffer, char data);
 void ring_buffer_queue_arr(ring_buffer_t *buffer, const char *data, ring_buffer_size_t size);
 
 /**
+ * Adds size elements from source ring buffer to ring buffer.
+ * @param buffer The buffer in which the data should be placed.
+ * @param src_buffer The buffer from which the data should be taken.
+ * @param size The number of bytes to be taken.
+ */
+void ring_buffer_queue_rb(ring_buffer_t *buffer, ring_buffer_t *src_buffer, ring_buffer_size_t size);
+
+/**
  * Returns the oldest byte in a ring buffer.
  * @param buffer The buffer from which the data should be returned.
  * @param data A pointer to the location at which the data should be placed.
